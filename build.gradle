@@ -1,10 +1,10 @@
 apply plugin: 'idea'
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
-
 repositories {
-    jcenter()
+    maven {
+        url "http://maven.aliyun.com/nexus/content/groups/public"
+    }
 }
 
 dependencies {
@@ -16,6 +16,7 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
     compile 'org.projectlombok:lombok:1.16.10'
     compile 'org.apache.commons:commons-lang3:3.4'
+    compile "org.hibernate:hibernate-entitymanager:4.3.10.Final"
 
     jar {
         from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }

@@ -6,16 +6,14 @@ import com.google.common.base.CaseFormat;
 import com.mysql.cj.core.util.StringUtils;
 import com.squareup.javapoet.*;
 import lombok.Data;
-import org.apache.commons.lang3.SystemUtils;
 
 import javax.lang.model.element.Modifier;
+import javax.persistence.Column;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,19 +109,11 @@ public class GenerateJavaCodeFromMysql {
                                 clazz = BigInteger.class;
                                 break;
                             case "java.sql.Date":
-                                if (useLocalDate && (SystemUtils.IS_JAVA_1_8 || SystemUtils.IS_JAVA_1_9)) {
-                                    clazz = LocalDate.class;
-                                } else {
-                                    clazz = java.util.Date.class;
-                                }
+                                clazz = java.util.Date.class;
                                 break;
                             case "java.sql.Time":
                             case "java.sql.Timestamp":
-                                if (useLocalDateTime && (SystemUtils.IS_JAVA_1_8 || SystemUtils.IS_JAVA_1_9)) {
-                                    clazz = LocalDateTime.class;
-                                } else {
-                                    clazz = java.util.Date.class;
-                                }
+                                clazz = java.util.Date.class;
                                 break;
                             case "[B":
                                 clazz = byte[].class;
@@ -139,6 +129,10 @@ public class GenerateJavaCodeFromMysql {
                         if (!StringUtils.isNullOrEmpty(fieldComment)) {
                             fieldSpecBuilder.addJavadoc(fieldComment + "\n");
                         }
+
+                        AnnotationSpec columnAnnotation = AnnotationSpec.builder(Column.class).addMember("name", "$S", metadata.getColumnName(i)).build();
+                        fieldSpecBuilder.addAnnotation(columnAnnotation);
+
                         builder.addField(fieldSpecBuilder.build());
                     }
 
